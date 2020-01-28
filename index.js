@@ -21,7 +21,7 @@ let Blog = mongoose.model("Blog", blogSchema)
 //RESTFUL ROUTES
 
 app.get("/", function (req,res){
-   
+  
     res.redirect("/blogs")
 });
 
@@ -34,6 +34,22 @@ app.get("/blogs", function (req,res){
         }
     });
 })
+
+app.get("/blogs/new", function(req,res){
+    res.render("new")
+})
+
+app.post("/blogs", function(req,res){
+     // create blog
+     Blog.create(req.body.blog, function(err, newBlog){
+        if(err){
+            res.render("new");
+        } else {
+            res.redirect("/blogs")
+        }
+//then redirect
+        });
+}); 
 
 app.listen(5500, process.env.IP, function(){
     console.log("Blog App Server")
