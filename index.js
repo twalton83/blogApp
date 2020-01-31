@@ -1,12 +1,14 @@
 const bodyParser = require("body-parser")
 const express = require("express")
 const mongoose = require("mongoose")
+const methodOverride = require("method-override")
 app = express();
 //app config
 mongoose.connect("mongodb://localhost/restful_blog_app", {useNewUrlParser : true})
 app.set("view engine", "ejs")
 app.use(express.static("public"));
-app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(methodOverride("_method"));
 
 //Mongoose Modle Confige
 let blogSchema = new mongoose.Schema({
@@ -60,6 +62,28 @@ app.get("/blogs/:id", function(req,res){
         }
     })
 })
+
+app.get("/blogs/:id/edit", function(req,res){
+    Blog.findById(req.params.id, function(err, foundBlog){
+        if(err){
+            res.redirect("/blogs")
+        } else {
+            res.render("edit",{blog : foundBlog})
+        }
+    })
+ 
+});
+
+app.put("/blogs/:id", function(req, res){
+   Blog.findByIdAndUpdate(req.params.id, req.body.blog, function(err, updatedBlog){
+      if(err){
+          console.log(err)
+          res.redirect("/blogs");
+      }  else {
+          res.redirect("/blogs/" + updatedBlog._id);
+      }
+   });
+});
 
 app.listen(5500, process.env.IP, function(){
     console.log("Blog App Server")
